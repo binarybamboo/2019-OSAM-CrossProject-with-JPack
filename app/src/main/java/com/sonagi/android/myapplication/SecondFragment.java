@@ -1,6 +1,10 @@
 package com.sonagi.android.myapplication;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +21,24 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.sonagi.android.myapplication.today_tab.MyAdapter;
 import com.sonagi.android.myapplication.today_tab.MyListDecoration;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class SecondFragment extends Fragment {
-
 
     private RecyclerView listview;
     private MyAdapter adapter;
@@ -35,6 +49,9 @@ public class SecondFragment extends Fragment {
     ListView list_listView;
     Button btnAdd, btnDel;
     EditText editText;
+    String token;
+    JSONArray monthSchedule;
+    JSONArray currentSchedule;
 
     private ListView m_oListView = null;
 
@@ -53,12 +70,81 @@ public class SecondFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =inflater.inflate(R.layout.fragment_second, container, false);
+        SharedPreferences sf = getActivity().getSharedPreferences("auth_token", MODE_PRIVATE);
+        token = sf.getString("token", "null");
+
+        if (token.equals("null")) {
+            Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
+            startActivity(intent);
+        }
         init(view);
 
 
         return view;
     }
+
+    public JSONArray getSchedule(final int year, final int month) {
+        class Get extends AsyncTask<String, Void, JSONArray> {
+            @Override
+            public JSONArray doInBackground(String... strings) {
+                try {
+                    URL url = new URL(strings[0] + "schedule/list/" + Integer.toString(year) + "/" + Integer.toString(month) + "/");
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setReadTimeout(3000);
+                    httpURLConnection.setConnectTimeout(3000);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setRequestProperty("Authorization", "jwt " + token);
+                    httpURLConnection.setRequestProperty("Content-Type","application/json");
+                    httpURLConnection.setRequestProperty("Accept","application/json");
+                    httpURLConnection.setRequestMethod("GET");
+                    httpURLConnection.setUseCaches(false);
+
+                    int statusCode = httpURLConnection.getResponseCode();
+
+                    if (statusCode == 200) {
+                        InputStream is = httpURLConnection.getInputStream();
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        byte[] byteBuffer = new byte[1024];
+                        byte[] byteData = null;
+                        int nLength = 0;
+                        while((nLength = is.read(byteBuffer, 0, byteBuffer.length)) != -1) {
+                            baos.write(byteBuffer, 0, nLength);
+                        }
+                        byteData = baos.toByteArray();
+
+                        String response = new String(byteData);
+                        System.out.println(response);
+
+                        JSONArray jsonArray = new JSONArray(response);
+                        return jsonArray;
+                    } else {
+                        Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
+                        startActivity(intent);
+                        getActivity().finish();
+
+                        throw new Exception();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity().getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+
+                    JSONArray jsonArray = new JSONArray();
+                    return jsonArray;
+                }
+            }
+        }
+        try {
+            Get get = new Get();
+            return get.execute("http://13.125.196.191/").get();
+        } catch (Exception e) {
+            return new JSONArray();
+        }
+    }
+
     public void init(View view){
+        Calendar calendar = Calendar.getInstance();
+        monthSchedule = getSchedule(calendar.get(calendar.YEAR), calendar.get(calendar.MONTH));
+
         listview = (RecyclerView)view.findViewById(R.id.main_listview);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         listview.setLayoutManager(layoutManager);

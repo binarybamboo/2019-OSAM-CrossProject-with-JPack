@@ -121,6 +121,11 @@ public class ThirdFragment extends Fragment {
                         Pair<Boolean, JSONObject> pair = new Pair<Boolean, JSONObject>(true, responseJSON);
 
                         return pair;
+                    } else if (statusCode == 404) {
+                        JSONObject responseJSON = new JSONObject("{\"message\":\"404\"}");
+                        Pair<Boolean, JSONObject> pair = new Pair<Boolean, JSONObject>(true, responseJSON);
+
+                        return pair;
                     } else {
                         InputStream is = httpURLConnection.getErrorStream();
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -156,7 +161,13 @@ public class ThirdFragment extends Fragment {
             Pair<Boolean, JSONObject> pair = get.execute(API_URL).get();
 
             if (pair.first) {
-                dataProcess(pair.second);
+                if (pair.second.isNull("message")) {
+                    dataProcess(pair.second);
+                } else {
+                    Intent intent = new Intent(getActivity().getApplicationContext(), InfoRegisterActivity.class);
+                    startActivity(intent);
+                    getActivity().finish();
+                }
             } else {
                 Toast.makeText(getActivity().getApplicationContext(), "심상치 않은 오류가 발생했습니다.", Toast.LENGTH_LONG).show();
             }
