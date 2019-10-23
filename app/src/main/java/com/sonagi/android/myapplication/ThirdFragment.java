@@ -178,24 +178,24 @@ public class ThirdFragment extends Fragment {
         View.OnClickListener listener = new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                switch(v.getId()) {
-                    case R.id.info_modi:
-                        Log.d("msg: ","nonono");
-                        intent = new Intent(getActivity().getApplicationContext(), InfoModifyActivity.class);
-                        startActivity(intent);
-                        break;
-                    case R.id.info_out:
-                        SharedPreferences sf = getActivity().getSharedPreferences("auth_token", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sf.edit();
-                        editor.putString("token", "null");
-                        editor.commit();
+            switch(v.getId()) {
+                case R.id.info_modi:
+                    Log.d("msg: ","nonono");
+                    intent = new Intent(getActivity().getApplicationContext(), InfoModifyActivity.class);
+                    startActivity(intent);
+                    break;
+                case R.id.info_out:
+                    SharedPreferences sf = getActivity().getSharedPreferences("auth_token", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sf.edit();
+                    editor.putString("token", "null");
+                    editor.commit();
 
-                        intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
-                        startActivity(intent);
-                        getActivity().finish();
-                        break;
+                    intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
+                    startActivity(intent);
+                    getActivity().finish();
+                    break;
 
-                }
+            }
             }
         };
         info_modi.setOnClickListener(listener);

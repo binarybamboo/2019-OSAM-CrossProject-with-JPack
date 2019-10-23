@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,6 +27,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -141,6 +143,151 @@ public class SecondFragment extends Fragment {
         }
     }
 
+    public Boolean postSchedule(final int type, final String title, final String start_date, final String end_date) {
+        class Post extends AsyncTask<String, Void, Boolean> {
+            public Boolean doInBackground(String... strings) {
+                try {
+                    URL url = new URL(strings[0] + "schedule/write/");
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setReadTimeout(3000);
+                    httpURLConnection.setConnectTimeout(3000);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setRequestProperty("Authorization", "jwt " + token);
+                    httpURLConnection.setRequestProperty("Content-Type","application/json");
+                    httpURLConnection.setRequestProperty("Accept","application/json");
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setUseCaches(false);
+
+                    JSONObject obj = new JSONObject();
+                    obj.put("type", type);
+                    obj.put("title", title);
+                    obj.put("start_date", start_date);
+                    obj.put("end_date", end_date);
+                    obj.put("content", title);
+
+                    OutputStream os = httpURLConnection.getOutputStream();
+                    os.write(obj.toString().getBytes());
+                    os.flush();
+
+                    int statusCode = httpURLConnection.getResponseCode();
+
+                    if (statusCode == 201) {
+                        Toast.makeText(getActivity().getApplicationContext(), "성공적으로 등록되었습니다.", Toast.LENGTH_LONG).show();
+                        return true;
+                    } else {
+                        Toast.makeText(getActivity().getApplicationContext(), "서버와의 통신이 원활하지 않습니다.", Toast.LENGTH_LONG).show();
+                        return false;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity().getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            }
+        }
+        try {
+            Post post = new Post();
+            return post.execute("http://13.125.196.191/").get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public Boolean putSchedule(final int pk, final int type, final String title, final String start_date, final String end_date) {
+        class Put extends AsyncTask<String, Void, Boolean> {
+            public Boolean doInBackground(String... strings) {
+                try {
+                    URL url = new URL(strings[0] + "schedule/" + Integer.toString(pk) +"/");
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setReadTimeout(3000);
+                    httpURLConnection.setConnectTimeout(3000);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setRequestProperty("Authorization", "jwt " + token);
+                    httpURLConnection.setRequestProperty("Content-Type","application/json");
+                    httpURLConnection.setRequestProperty("Accept","application/json");
+                    httpURLConnection.setRequestMethod("PUT");
+                    httpURLConnection.setUseCaches(false);
+
+                    JSONObject obj = new JSONObject();
+                    obj.put("type", type);
+                    obj.put("title", title);
+                    obj.put("start_date", start_date);
+                    obj.put("end_date", end_date);
+                    obj.put("content", title);
+
+                    OutputStream os = httpURLConnection.getOutputStream();
+                    os.write(obj.toString().getBytes());
+                    os.flush();
+
+                    int statusCode = httpURLConnection.getResponseCode();
+
+                    if (statusCode == 202) {
+                        Toast.makeText(getActivity().getApplicationContext(), "성공적으로 등록되었습니다.", Toast.LENGTH_LONG).show();
+                        return true;
+                    } else {
+                        Toast.makeText(getActivity().getApplicationContext(), "서버와의 통신이 원활하지 않습니다. 잠시후 다시 시도해 주세요", Toast.LENGTH_LONG).show();
+                        return false;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity().getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            }
+        }
+        try {
+            Put put = new Put();
+            return put.execute("http://13.125.196.191/").get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public Boolean deleteSchedule(final int pk) {
+        class Delete extends AsyncTask<String, Void, Boolean> {
+            public Boolean doInBackground(String... strings) {
+                try {
+                    URL url = new URL(strings[0] + "schedule/" + Integer.toString(pk) +"/");
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setReadTimeout(3000);
+                    httpURLConnection.setConnectTimeout(3000);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setRequestProperty("Authorization", "jwt " + token);
+                    httpURLConnection.setRequestProperty("Content-Type","application/json");
+                    httpURLConnection.setRequestProperty("Accept","application/json");
+                    httpURLConnection.setRequestMethod("PUT");
+                    httpURLConnection.setUseCaches(false);
+
+                    int statusCode = httpURLConnection.getResponseCode();
+
+                    if (statusCode == 202) {
+                        Toast.makeText(getActivity().getApplicationContext(), "성공적으로 제거되었습니다.", Toast.LENGTH_LONG).show();
+                        return true;
+                    } else {
+                        Toast.makeText(getActivity().getApplicationContext(), "서버와의 통신이 원활하지 않습니다. 잠시후 다시 시도해 주세요", Toast.LENGTH_LONG).show();
+                        return false;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity().getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            }
+        }
+        try {
+            Delete delete = new Delete();
+            return delete.execute("http://13.125.196.191/").get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public void init(View view){
         Calendar calendar = Calendar.getInstance();
         monthSchedule = getSchedule(calendar.get(calendar.YEAR), calendar.get(calendar.MONTH));
@@ -199,7 +346,6 @@ public class SecondFragment extends Fragment {
                             list_listView.clearChoices();
                             list_Adapter.notifyDataSetChanged();
                         }
-
                 }
             }
         };
