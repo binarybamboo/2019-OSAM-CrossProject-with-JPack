@@ -41,6 +41,13 @@ public class RegisterActivity extends Activity {
 
         if (s_id.length() == 0 || s_password.length() == 0 || s_first_name.length() == 0 || s_last_name.length() == 0 || s_email.length() == 0) {
             Toast.makeText(getApplicationContext(), "입력하지 않은 필드가 존재합니다.", Toast.LENGTH_LONG).show();
+            return;
+        } else if (!s_email.matches(" ^[a-zA-Z0-9]+@[a-zA-Z0-9]+$")) {
+            Toast.makeText(getApplicationContext(), "이메일을 정확한 형식으로 입력 해 주세요.", Toast.LENGTH_LONG).show();
+            return;
+        } else if (!s_password.matches("/^[a-z]{4,12}$/")) {
+            Toast.makeText(getApplicationContext(), "비밀번호는 4~12 자리입니다.", Toast.LENGTH_LONG).show();
+            return;
         }
 
         try {

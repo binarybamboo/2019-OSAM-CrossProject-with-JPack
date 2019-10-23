@@ -3,8 +3,10 @@ package com.sonagi.android.myapplication;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -26,10 +28,18 @@ import com.sonagi.android.myapplication.decorators.OneDayDecorator;
 import com.sonagi.android.myapplication.decorators.SaturdayDecorator;
 import com.sonagi.android.myapplication.decorators.SundayDecorator;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -49,7 +59,7 @@ public class FirstFragment extends Fragment{
     Button btnSave;   //  btnSave - 선택한 날짜의 일기 저장 및 수정(덮어쓰기) 버튼
     String fileName;   //  fileName - 돌고 도는 선택된 날짜의 파일 이름
     String [] permission_list={Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.READ_CALENDAR}; //파일입출력을 위한 권한 체크
-
+    String token;
 
     public FirstFragment() {
         // Required empty public constructor
@@ -114,6 +124,204 @@ public class FirstFragment extends Fragment{
         return view;
     }
 
+    public JSONArray getDiaryList(final int year, final int month) {
+        class Get extends AsyncTask<String, Void, JSONArray> {
+            @Override
+            public JSONArray doInBackground(String... strings) {
+                try {
+                    URL url = new URL(strings[0] + "diary/list/" + Integer.toString(year) + "/" + Integer.toString(month) + "/");
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setReadTimeout(3000);
+                    httpURLConnection.setConnectTimeout(3000);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setRequestProperty("Authorization", "jwt " + token);
+                    httpURLConnection.setRequestProperty("Content-Type","application/json");
+                    httpURLConnection.setRequestProperty("Accept","application/json");
+                    httpURLConnection.setRequestMethod("GET");
+                    httpURLConnection.setUseCaches(false);
+
+                    int statusCode = httpURLConnection.getResponseCode();
+
+                    if (statusCode == 200) {
+                        InputStream is = httpURLConnection.getInputStream();
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        byte[] byteBuffer = new byte[1024];
+                        byte[] byteData = null;
+                        int nLength = 0;
+                        while((nLength = is.read(byteBuffer, 0, byteBuffer.length)) != -1) {
+                            baos.write(byteBuffer, 0, nLength);
+                        }
+                        byteData = baos.toByteArray();
+
+                        String response = new String(byteData);
+                        System.out.println(response);
+
+                        JSONArray jsonArray = new JSONArray(response);
+                        return jsonArray;
+                    } else {
+                        Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
+                        startActivity(intent);
+                        getActivity().finish();
+
+                        throw new Exception();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity().getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+
+                    JSONArray jsonArray = new JSONArray();
+                    return jsonArray;
+                }
+            }
+        }
+        try {
+            Get get = new Get();
+            return get.execute("http://13.125.196.191/").get();
+        } catch (Exception e) {
+            return new JSONArray();
+        }
+    }
+
+    public Boolean postDiary(final String title, final String written, final String content) {
+        class Post extends AsyncTask<String, Void, Boolean> {
+            public Boolean doInBackground(String... strings) {
+                try {
+                    URL url = new URL(strings[0] + "diary/write/");
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setReadTimeout(3000);
+                    httpURLConnection.setConnectTimeout(3000);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setRequestProperty("Authorization", "jwt " + token);
+                    httpURLConnection.setRequestProperty("Content-Type","application/json");
+                    httpURLConnection.setRequestProperty("Accept","application/json");
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setUseCaches(false);
+
+                    JSONObject obj = new JSONObject();
+                    obj.put("title", title);
+                    obj.put("written", written);
+                    obj.put("content", content);
+
+                    OutputStream os = httpURLConnection.getOutputStream();
+                    os.write(obj.toString().getBytes());
+                    os.flush();
+
+                    int statusCode = httpURLConnection.getResponseCode();
+
+                    if (statusCode == 201) {
+                        Toast.makeText(getActivity().getApplicationContext(), "성공적으로 등록되었습니다.", Toast.LENGTH_LONG).show();
+                        return true;
+                    } else {
+                        Toast.makeText(getActivity().getApplicationContext(), "서버와의 통신이 원활하지 않습니다.", Toast.LENGTH_LONG).show();
+                        return false;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity().getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            }
+        }
+        try {
+            Post post = new Post();
+            return post.execute("http://13.125.196.191/").get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public Boolean putDiary(final int pk, final String title, final String written, final String content) {
+        class Put extends AsyncTask<String, Void, Boolean> {
+            public Boolean doInBackground(String... strings) {
+                try {
+                    URL url = new URL(strings[0] + "diary/" + Integer.toString(pk) +"/");
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setReadTimeout(3000);
+                    httpURLConnection.setConnectTimeout(3000);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setRequestProperty("Authorization", "jwt " + token);
+                    httpURLConnection.setRequestProperty("Content-Type","application/json");
+                    httpURLConnection.setRequestProperty("Accept","application/json");
+                    httpURLConnection.setRequestMethod("PUT");
+                    httpURLConnection.setUseCaches(false);
+
+                    JSONObject obj = new JSONObject();
+                    obj.put("title", title);
+                    obj.put("written", written);
+                    obj.put("content", content);
+
+                    OutputStream os = httpURLConnection.getOutputStream();
+                    os.write(obj.toString().getBytes());
+                    os.flush();
+
+                    int statusCode = httpURLConnection.getResponseCode();
+
+                    if (statusCode == 201) {
+                        Toast.makeText(getActivity().getApplicationContext(), "성공적으로 등록되었습니다.", Toast.LENGTH_LONG).show();
+                        return true;
+                    } else {
+                        Toast.makeText(getActivity().getApplicationContext(), "서버와의 통신이 원활하지 않습니다. 잠시후 다시 시도해 주세요", Toast.LENGTH_LONG).show();
+                        return false;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity().getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            }
+        }
+        try {
+            Put put = new Put();
+            return put.execute("http://13.125.196.191/").get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public Boolean deleteDiary(final int pk) {
+        class Delete extends AsyncTask<String, Void, Boolean> {
+            public Boolean doInBackground(String... strings) {
+                try {
+                    URL url = new URL(strings[0] + "diary/" + Integer.toString(pk) +"/");
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setReadTimeout(3000);
+                    httpURLConnection.setConnectTimeout(3000);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setRequestProperty("Authorization", "jwt " + token);
+                    httpURLConnection.setRequestProperty("Content-Type","application/json");
+                    httpURLConnection.setRequestProperty("Accept","application/json");
+                    httpURLConnection.setRequestMethod("PUT");
+                    httpURLConnection.setUseCaches(false);
+
+                    int statusCode = httpURLConnection.getResponseCode();
+
+                    if (statusCode == 201) {
+                        Toast.makeText(getActivity().getApplicationContext(), "성공적으로 제거되었습니다.", Toast.LENGTH_LONG).show();
+                        return true;
+                    } else {
+                        Toast.makeText(getActivity().getApplicationContext(), "서버와의 통신이 원활하지 않습니다. 잠시후 다시 시도해 주세요", Toast.LENGTH_LONG).show();
+                        return false;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity().getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            }
+        }
+        try {
+            Delete delete = new Delete();
+            return delete.execute("http://13.125.196.191/").get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     //데이터피커 리스너
     class DateListener implements OnDateSelectedListener{
