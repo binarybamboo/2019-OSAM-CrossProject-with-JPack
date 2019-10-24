@@ -54,7 +54,8 @@
  	  ㄴMaterialCalendarView
  
  	ㄴSecondFragement (fragment_second.xml)
- 
+ 	  ㄴ 가로 listview (com.sonagi.android.myapplication/today_tab)
+	  ㄴ 일정 listview (com.sonagi.android.myapplication/row)
  	ㄴThirdFragment (fragment_third.xml)
 	  ㄴInfoModifyActivity (activity_info_modify.xml)
  	ㄴ...
