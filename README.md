@@ -75,4 +75,4 @@ LoadingActivity
   ~~### plz Email happyjarban@gmail.com~~
   
 ## Change Log
- [2019:10:25]Relaese 1.0 version 
+ [2019.10.25]Relaese 1.0 version 
