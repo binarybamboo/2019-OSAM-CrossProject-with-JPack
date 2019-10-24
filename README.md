@@ -36,30 +36,22 @@
   
 ## File Manifest
 
-LoadingActivity
-
+### LoadingActivity 
 
  ㄴLoginActivity
  
- 
  ㄴRegistrActivity
- 
  
  ㄴInfoModifyActivity
  
  
-
- MainActivty(BottomNavigationView)
- 
+ ### MainActivty(BottomNavigationView)
  
  ㄴFirstFragement
  
- 
  ㄴSecondFragement
  
- 
  ㄴThirdFragment
- 
  
  ㄴ...
   
