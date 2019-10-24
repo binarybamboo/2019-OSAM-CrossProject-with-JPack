@@ -66,8 +66,11 @@ public class SecondFragment extends Fragment {
     private ArrayList<String> spinnerArray;
     private ArrayAdapter<String> arrayAdapter;
     private Spinner spinner;
+    private int cal_month;
+    private int cal_year;
 
-    Button btnAdd, btnDel;
+    Button btnAdd, btnDel, prevBtn, nextBtn;
+    TextView cal_text;
     EditText editText;
     String token;
     JSONArray monthSchedule;
@@ -100,10 +103,90 @@ public class SecondFragment extends Fragment {
             startActivity(intent);
         }
 
+        prevBtn = (Button)view.findViewById(R.id.prev);
+        nextBtn = (Button)view.findViewById(R.id.next);
+        cal_text = (TextView)view.findViewById(R.id.calendar);
+
+        prevBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prevMonth(view);
+            }
+        });
+        nextBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                nextMonth(view);
+            }
+        });
+
         init(view);
 
 
         return view;
+    }
+
+    public void prevMonth(View view) {
+        if (cal_month == 1) {
+            cal_month = 12;
+            cal_year--;
+        } else {
+            cal_month--;
+        }
+        cal_text.setText(cal_year +  " / " + cal_month);
+
+        monthSchedule = getSchedule(cal_year, cal_month);
+        myAdapter.initArray();
+
+        try {
+            for (int i = 0; i < monthSchedule.length(); i++) {
+                JSONObject jsonObject = monthSchedule.getJSONObject(i);
+                int pk = jsonObject.getInt("id");
+                String title = jsonObject.getString("title");
+                String start_date = jsonObject.getString("start_date");
+                String end_date = jsonObject.getString("end_date");
+                int type = jsonObject.getInt("schedule_type");
+                myAdapter.addItem(pk, start_date, end_date, title, type);
+            }
+        } catch (Exception e) {
+            Toast.makeText(getActivity().getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+        mListView.setAdapter(myAdapter);
+        mListView.deferNotifyDataSetChanged();
+
+
+    }
+
+    public void nextMonth(View view) {
+        if (cal_month == 12) {
+            cal_month = 1;
+            cal_year++;
+        } else {
+            cal_month++;
+        }
+        cal_text.setText(cal_year +  " / " + cal_month);
+
+        monthSchedule = getSchedule(cal_year, cal_month);
+        myAdapter.initArray();
+
+        try {
+            for (int i = 0; i < monthSchedule.length(); i++) {
+                JSONObject jsonObject = monthSchedule.getJSONObject(i);
+                int pk = jsonObject.getInt("id");
+                String title = jsonObject.getString("title");
+                String start_date = jsonObject.getString("start_date");
+                String end_date = jsonObject.getString("end_date");
+                int type = jsonObject.getInt("schedule_type");
+                myAdapter.addItem(pk, start_date, end_date, title, type);
+            }
+        } catch (Exception e) {
+            Toast.makeText(getActivity().getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+
+        mListView.setAdapter(myAdapter);
+        mListView.deferNotifyDataSetChanged();
     }
 
     public JSONArray getNearSchedule() {
@@ -306,7 +389,7 @@ public class SecondFragment extends Fragment {
                     httpURLConnection.setUseCaches(false);
 
                     JSONObject obj = new JSONObject();
-                    obj.put("type", type);
+                    obj.put("schedule_type", type);
                     obj.put("title", title);
                     obj.put("start_date", start_date);
                     obj.put("end_date", end_date);
@@ -388,6 +471,9 @@ public class SecondFragment extends Fragment {
 
         Calendar calendar = Calendar.getInstance();
         System.out.println(calendar.toString());
+        cal_year = calendar.get(calendar.YEAR);
+        cal_month = calendar.get(calendar.MONTH) + 1;
+        cal_text.setText(cal_year +  " / " + cal_month);
         monthSchedule = getSchedule(calendar.get(calendar.YEAR), calendar.get(calendar.MONTH) + 1);
         myAdapter.initArray();
 

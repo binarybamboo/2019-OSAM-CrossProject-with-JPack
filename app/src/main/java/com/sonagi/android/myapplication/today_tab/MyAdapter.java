@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -54,6 +55,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             holder.dateContentView.setTag(start_date + "~" + end_date);
         }
 
+        switch (itemList.get(position).schedule_type) {
+            case 0:
+                holder.imageView.setImageResource(R.drawable.flag);
+                break;
+            case 1:
+                holder.imageView.setImageResource(R.drawable.shovel);
+                break;
+            case 2:
+                holder.imageView.setImageResource(R.drawable.holiday);
+                break;
+        }
+
     }
 
     @Override
@@ -66,6 +79,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
         public TextView titleView;
         public TextView dateContentView;
+        public ImageView imageView;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -73,6 +87,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
             titleView = itemView.findViewById(R.id.title);
             dateContentView = itemView.findViewById(R.id.date_content);
+            imageView = itemView.findViewById(R.id.image);
         }
     }
 

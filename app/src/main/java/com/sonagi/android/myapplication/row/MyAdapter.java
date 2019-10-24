@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,7 +63,8 @@ public class MyAdapter extends BaseAdapter {
         /* 'listview_custom'에 정의된 위젯에 대한 참조 획득 */
         TextView title = (TextView) convertView.findViewById(R.id.title) ;
         TextView content = (TextView) convertView.findViewById(R.id.date_content) ;
-        CheckBox checkBox = (CheckBox)convertView.findViewById(R.id.checkbox);;
+        CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkbox);;
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.icon);
 
         /* 각 리스트에 뿌려줄 아이템을 받아오는데 mMyItem 재활용 */
         final CheckSchedule myItem = getItem(position);
@@ -71,6 +73,17 @@ public class MyAdapter extends BaseAdapter {
         title.setText(myItem.title);
         content.setText(myItem.start_date + "~" + myItem.end_date);
         checkBox.setChecked(myItem.check);
+        switch (myItem.schedule_type) {
+            case 0:
+                imageView.setImageResource(R.drawable.flag);
+                break;
+            case 1:
+                imageView.setImageResource(R.drawable.shovel);
+                break;
+            case 2:
+                imageView.setImageResource(R.drawable.holiday);
+                break;
+        }
 
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

@@ -26,12 +26,35 @@
 
     </androidx.recyclerview.widget.RecyclerView>
 
-    <TextView
-        android:id="@+id/textView2"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="일정 계획" />
+        android:layout_margin="10dp">
+        <Button
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            style="?android:attr/borderlessButtonStyle"
+            android:background="@drawable/arrow"
+            android:rotation="270"
+            android:id="@+id/prev"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="2019 / 6"
+            android:textSize="18dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:id="@+id/calendar"/>
+        <Button
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            style="?android:attr/borderlessButtonStyle"
+            android:background="@drawable/arrow"
+            android:rotation="90"
+            android:id="@+id/next"/>
+    </LinearLayout>
 
 
     <LinearLayout
