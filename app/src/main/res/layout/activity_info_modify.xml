@@ -33,10 +33,12 @@
                 android:text="좌우명  *"
                 android:textSize="18dp"
                 android:layout_marginRight="14dp"/>
+
             <EditText
+                android:id="@+id/say"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/say"/>
+                android:singleLine="true" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
