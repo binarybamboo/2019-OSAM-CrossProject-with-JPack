@@ -1,5 +1,9 @@
 package com.sonagi.android.myapplication;
 
+
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,11 +37,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 
 /**
@@ -314,7 +320,6 @@ public class SecondFragment extends Fragment {
 
         MyListDecoration decoration = new MyListDecoration();
         listview.addItemDecoration(decoration);
-
 
 
          View.OnClickListener listener = new View.OnClickListener(){
