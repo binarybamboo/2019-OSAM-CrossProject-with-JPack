@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/s_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="7"
+            android:hint="시작일"
+            android:inputType="textPersonName"
+            android:singleLine="true" />
+
+        <EditText
+            android:id="@+id/e_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="8"
+            android:hint="종료일"
+            android:inputType="textPersonName"
+            android:singleLine="true" />
+
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="auto"
+            android:gravity="right|center" />
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/plan"
+        android:layout_width="match_parent"
+        android:layout_height="102dp"
+        android:ems="10"
+        android:gravity="start|top"
+        android:hint="일정을 입력해주세요."
+        android:inputType="textMultiLine" />
+</LinearLayout>
