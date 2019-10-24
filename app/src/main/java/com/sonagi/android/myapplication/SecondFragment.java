@@ -1,5 +1,8 @@
 package com.sonagi.android.myapplication;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -30,11 +33,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 
 /**
@@ -320,8 +325,6 @@ public class SecondFragment extends Fragment {
         editText = (EditText) view.findViewById(R.id.editText);
         btnAdd  = (Button) view.findViewById(R.id.btnAdd);
         btnDel  = (Button) view.findViewById(R.id.btnDel);
-
-
 
         btnAdd  = (Button) view.findViewById(R.id.btnAdd);
         btnDel = (Button)view.findViewById(R.id.btnDel);

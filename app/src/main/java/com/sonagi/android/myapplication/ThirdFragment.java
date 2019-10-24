@@ -1,10 +1,14 @@
 package com.sonagi.android.myapplication;
 
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -23,6 +27,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -72,6 +77,7 @@ public class ThirdFragment extends Fragment {
         if (token.equals("null")) {
             Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
             startActivity(intent);
+            getActivity().finish();
         }
 
         classes = (TextView)view.findViewById(R.id.classes);
@@ -161,8 +167,32 @@ public class ThirdFragment extends Fragment {
             Pair<Boolean, JSONObject> pair = get.execute(API_URL).get();
 
             if (pair.first) {
-                if (pair.second.isNull("message")) {
+                if (pair.second.isNull("message")) { // 성공
                     dataProcess(pair.second);
+
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    if (!prefs.getBoolean("firstTime", false)) {
+
+                        Intent alarmIntent = new Intent(getActivity(), AlarmReceiver.class);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, alarmIntent, 0);
+
+                        AlarmManager manager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(System.currentTimeMillis());
+                        calendar.set(Calendar.HOUR_OF_DAY, 18);
+                        calendar.set(Calendar.MINUTE, 0);
+                        calendar.set(Calendar.SECOND, 0);
+
+                        manager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                                AlarmManager.INTERVAL_DAY, pendingIntent);
+
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean("firstTime", true);
+                        editor.apply();
+                    }
+
+
                 } else {
                     Intent intent = new Intent(getActivity().getApplicationContext(), InfoRegisterActivity.class);
                     startActivity(intent);

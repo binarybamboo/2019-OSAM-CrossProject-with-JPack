@@ -52,12 +52,16 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView textview;
+        public TextView titleView;
+        public TextView startView;
+        public TextView endView;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
-            textview = itemView.findViewById(R.id.item_textview);
+            titleView = itemView.findViewById(R.id.title);
+            startView = itemView.findViewById(R.id.start_date);
+            endView = itemView
         }
     }
 }
