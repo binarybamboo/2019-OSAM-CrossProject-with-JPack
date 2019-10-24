@@ -39,26 +39,25 @@
   
 ## File Manifest
 
-**LoadingActivity** (activity_loading.xml)
+	**LoadingActivity** (activity_loading.xml)
 
- 	ㄴLoginActivity (activity_login.xml)
+ 	 ㄴLoginActivity (activity_login.xml)
  
- 	ㄴRegistrActivity (activity_info_register.xml)
+       	 ㄴRegistrActivity (activity_info_register.xml)
  
  	
  
  
- **MainActivty(BottomNavigationView)** (acitivity_main.xml)
+ 	**MainActivty(BottomNavigationView)** (acitivity_main.xml)
+ 	 ㄴFirstFragement (fragement_first)
+ 	   ㄴMaterialCalendarView
  
- 	ㄴFirstFragement (fragement_first)
- 	  ㄴMaterialCalendarView
- 
- 	ㄴSecondFragement (fragment_second.xml)
- 	  ㄴ 가로 listview (com.sonagi.android.myapplication/today_tab)
-	  ㄴ 일정 listview (com.sonagi.android.myapplication/row)
- 	ㄴThirdFragment (fragment_third.xml)
-	  ㄴInfoModifyActivity (activity_info_modify.xml)
- 	ㄴ...
+ 	 ㄴSecondFragement (fragment_second.xml)
+ 	   ㄴ 가로 listview (com.sonagi.android.myapplication/today_tab)
+	   ㄴ 일정 listview (com.sonagi.android.myapplication/row)
+ 	 ㄴThirdFragment (fragment_third.xml)
+	   ㄴInfoModifyActivity (activity_info_modify.xml)
+         ㄴ...
   
   **File Director**
 
