@@ -11,7 +11,9 @@
 
 ## Prerequisites
   SdkVersion 28(Min 16)
+  
   Java Jdk 8.0
+  
   AndroidStudio
 
 ## Front-End
