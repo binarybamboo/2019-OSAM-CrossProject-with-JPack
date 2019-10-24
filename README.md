@@ -37,14 +37,30 @@
 ## File Manifest
 
 LoadingActivity
+
+
  ㄴLoginActivity
+ 
+ 
  ㄴRegistrActivity
+ 
+ 
  ㄴInfoModifyActivity
+ 
+ 
 
  MainActivty(BottomNavigationView)
+ 
+ 
  ㄴFirstFragement
+ 
+ 
  ㄴSecondFragement
+ 
+ 
  ㄴThirdFragment
+ 
+ 
  ㄴ...
   
   #### File Director
