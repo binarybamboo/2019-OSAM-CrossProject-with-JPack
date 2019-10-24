@@ -23,7 +23,7 @@
                 android:background="@drawable/textview_underline"
                 android:clickable="true"
                 android:padding="4dp"
-                android:text="입대 일 *"
+                android:text="시작 일 *"
                 android:textSize="18dp" />
 
             <TextView
@@ -35,7 +35,7 @@
                 android:background="@drawable/textview_underline"
                 android:clickable="true"
                 android:padding="4dp"
-                android:text="제대 일 *"
+                android:text="종료 일 *"
                 android:textSize="18dp" />
         </LinearLayout>
         <EditText

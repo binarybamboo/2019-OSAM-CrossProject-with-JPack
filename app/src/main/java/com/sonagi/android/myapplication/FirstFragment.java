@@ -27,6 +27,7 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.sonagi.android.myapplication.decorators.OneDayDecorator;
 import com.sonagi.android.myapplication.decorators.SaturdayDecorator;
+import com.sonagi.android.myapplication.decorators.SaveDayDecorator;
 import com.sonagi.android.myapplication.decorators.SundayDecorator;
 
 import org.json.JSONArray;
@@ -41,6 +42,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -100,14 +102,8 @@ public class FirstFragment extends Fragment{
         //주말 데코레이터해주기
         datePicker.addDecorators(
                 new SundayDecorator(),
-                new SaturdayDecorator(),
-                oneDayDecorator);
-
-        // 초록색 추가
-        //datePicker.addDecorator(new SaveDayDecorator(year, month+1, day));
-
-
-
+                new SaturdayDecorator()
+                );
 
         // 오늘 날짜를 받게해주는 Calender 친구들
         Calendar c = Calendar.getInstance();
@@ -116,9 +112,25 @@ public class FirstFragment extends Fragment{
         int cMonth = c.get(Calendar.MONTH);cMonth++;
         int cDay = c.get(Calendar.DAY_OF_MONTH);
 
+        JSONArray jsonArray = getDiaryList(cYear, cMonth);
+        try {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String date_string = jsonObject.getString("written");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = simpleDateFormat.parse(date_string);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date);
+
+                datePicker.addDecorator(new SaveDayDecorator(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         // 첫 시작 시에는 오늘 날짜 일기 읽어주기
         checkedDay(cYear, cMonth, cDay);
-        DateListener listener=new DateListener();
+        DateListener listener = new DateListener();
         datePicker.setOnDateChangedListener(listener);
 
 
@@ -126,6 +138,7 @@ public class FirstFragment extends Fragment{
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                System.out.println(dateName);
                 saveDiary(dateName);
             }
         });
@@ -272,7 +285,7 @@ public class FirstFragment extends Fragment{
 
                     if (statusCode == 201) {
                         return true;
-                    } else {;
+                    } else {
                         return false;
                     }
                 } catch (Exception e) {
@@ -421,6 +434,14 @@ public class FirstFragment extends Fragment{
             Boolean check;
             if (isPost) {
                 check = postDiary(readDay, content);
+                if (check) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    Date date = sdf.parse(readDay);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(date);
+
+                    datePicker.addDecorator(new SaveDayDecorator(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)));
+                }
             } else {
                 check = putDiary(pk, content);
             }
