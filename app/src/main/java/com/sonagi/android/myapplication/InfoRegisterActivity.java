@@ -21,6 +21,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.regex.Pattern;
 
 public class InfoRegisterActivity extends Activity {
     private String API_URL = "http://13.125.196.191/";
@@ -95,8 +96,10 @@ public class InfoRegisterActivity extends Activity {
         final String s_say = say.getText().toString();
         final String f_token = token;
 
+
         if (s_start_date.length() == 0 || s_end_date.length() == 0 || s_say.length() == 0) {
             Toast.makeText(getApplicationContext(), "입력하지 않은 필드가 존재합니다.", Toast.LENGTH_LONG).show();
+            return;
         }
 
         try {
