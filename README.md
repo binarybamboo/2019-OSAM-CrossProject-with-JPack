@@ -61,7 +61,8 @@
   
   **File Director**
 
-   LoadingActivity에서 로그인에 대한 토큰 검사 후 없을 시 로그인 창, 있을시 MainActivty로 넘어가는 Acting
+   LoadingActivity에서 로그인에 대한 토큰 검사 후 없을 시 로그인 창
+   토큰 존재시  MainActivty로 넘어가는 방식입니다.
 
 
 ## Installation Process
