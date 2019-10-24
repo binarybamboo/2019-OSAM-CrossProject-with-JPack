@@ -8,10 +8,9 @@
 
 ### Developer
  #### 조찬민,박민재
-훈련병 시절부터 적어온 소나기가 핸드폰 실시 이후 존재감이 잊혀지고 있다<br>...*****~~(설마 너도 소나기 안쓰고 있니??)~~*****
-우리는 그 존재감을 다시 회복시키기 위해서 이 앱을 개발했다.
-일기만 쓴다면 우리는 핸드폰에 내장되어 있는 켈린더앱을 사용할 것이다.
-하지만 "소나기" App은 Simple InterFace기반으로 휴가, 훈련등의 계획관리도 쉽게 가능하고
+훈련병 시절부터 적어온 소나기가 핸드폰 실시 이후 존재감이 잊혀지고 있다...*****~~(설마 너도 소나기 안쓰고 있니??)~~*****
+우리는 그 존재감을 다시 회복시키기 위해서 이 앱을 개발했다.<br />일기만 쓴다면 우리는 핸드폰에 내장되어 있는 켈린더앱을 사용할 것이다.
+<br />하지만 "소나기" App은 사용자 중심의 InterFace기반으로 휴가, 훈련등의 계획관리도<br /> 쉽게 가능하고
         군 생활을 하는 사용자가 편리하도록 자신의 군생활에 관련된 정보를 제공해준다.
 
 ## App Functions
@@ -75,7 +74,7 @@
 	   ㄴ 추가 Dialog xml : add_diaog
  	 ㄴThirdFragment (fragment_third.xml)
 	   ㄴInfoModifyActivity xml : (activity_info_modify.xml)
-         ㄴAlarmReceiver
+         ㄴAlarmReceiver, AlarmService
   
   **Login Acting**
 
