@@ -72,7 +72,7 @@ LoadingActivity
  위의 연락처에 메일을 주십쇼! 
 
 ## Credit
-  # plz Email happyjarban@gmail.com
+  ~~### plz Email happyjarban@gmail.com~~
   
 ## Change Log
  [2019:10:25]Relaese 1.0 version 
