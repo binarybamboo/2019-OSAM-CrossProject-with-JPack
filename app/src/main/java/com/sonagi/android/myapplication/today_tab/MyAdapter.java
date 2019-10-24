@@ -14,11 +14,11 @@ import java.util.ArrayList;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
-    private ArrayList<String> itemList;
+    private ArrayList<Schedule> itemList;
     private Context context;
     private View.OnClickListener onClickItem;
 
-    public MyAdapter(Context context, ArrayList<String> itemList, View.OnClickListener onClickItem) {
+    public MyAdapter(Context context, ArrayList<Schedule> itemList, View.OnClickListener onClickItem) {
         this.context = context;
         this.itemList = itemList;
         this.onClickItem = onClickItem;
@@ -37,11 +37,23 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String item = itemList.get(position);
+        int pk = itemList.get(position).pk;
+        String title = itemList.get(position).title;
+        String start_date = itemList.get(position).start_date;
+        String end_date = itemList.get(position).end_date;
 
-        holder.textview.setText(item);
-        holder.textview.setTag(item);
-        holder.textview.setOnClickListener(onClickItem);
+        if (pk == -1) {
+            holder.titleView.setText("등록된 일정이 없습니다.");
+            holder.titleView.setTag("none_title");
+            holder.dateContentView.setText("일정을 등록 해 주세요!");
+            holder.dateContentView.setTag("none_date");
+        } else {
+            holder.titleView.setText(title);
+            holder.titleView.setTag(title);
+            holder.dateContentView.setText(start_date + "~" + end_date);
+            holder.dateContentView.setTag(start_date + "~" + end_date);
+        }
+
     }
 
     @Override
@@ -53,15 +65,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView titleView;
-        public TextView startView;
-        public TextView endView;
+        public TextView dateContentView;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(onClickItem);
 
             titleView = itemView.findViewById(R.id.title);
-            startView = itemView.findViewById(R.id.start_date);
-            endView = itemView
+            dateContentView = itemView.findViewById(R.id.date_content);
         }
     }
 }

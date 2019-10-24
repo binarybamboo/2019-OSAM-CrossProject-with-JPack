@@ -3,7 +3,7 @@ package com.sonagi.android.myapplication;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.Context
+import android.content.Context;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.sonagi.android.myapplication.row.Address_Item;
 import com.sonagi.android.myapplication.today_tab.MyAdapter;
 import com.sonagi.android.myapplication.today_tab.MyListDecoration;
+import com.sonagi.android.myapplication.today_tab.Schedule;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -91,6 +92,58 @@ public class SecondFragment extends Fragment {
 
 
         return view;
+    }
+
+    public JSONArray getNearSchedule() {
+        class Get extends AsyncTask<String, Void, JSONArray> {
+            @Override
+            public JSONArray doInBackground(String... strings) {
+                try {
+                    URL url = new URL(strings[0] + "schedule/near/");
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setReadTimeout(3000);
+                    httpURLConnection.setConnectTimeout(3000);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setRequestProperty("Authorization", "jwt " + token);
+                    httpURLConnection.setRequestProperty("Content-Type","application/json");
+                    httpURLConnection.setRequestProperty("Accept","application/json");
+                    httpURLConnection.setRequestMethod("GET");
+                    httpURLConnection.setUseCaches(false);
+
+                    int statusCode = httpURLConnection.getResponseCode();
+
+                    if (statusCode == 200) {
+                        InputStream is = httpURLConnection.getInputStream();
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        byte[] byteBuffer = new byte[1024];
+                        byte[] byteData = null;
+                        int nLength = 0;
+                        while((nLength = is.read(byteBuffer, 0, byteBuffer.length)) != -1) {
+                            baos.write(byteBuffer, 0, nLength);
+                        }
+                        byteData = baos.toByteArray();
+
+                        String response = new String(byteData);
+                        System.out.println(response);
+
+                        JSONArray responseJSON = new JSONArray(response);
+                        return responseJSON;
+                    } else {
+                        return new JSONArray();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return new JSONArray();
+                }
+            }
+        }
+        try {
+            Get get = new Get();
+            return get.execute("http://13.125.196.191/").get();
+        } catch (Exception e) {
+            return new JSONArray();
+        }
+
     }
 
     public JSONArray getSchedule(final int year, final int month) {
@@ -307,10 +360,34 @@ public class SecondFragment extends Fragment {
         listview = (RecyclerView)view.findViewById(R.id.main_listview);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         listview.setLayoutManager(layoutManager);
-        ArrayList<String> itemList = new ArrayList<>(); //itemlist를 불러와서 서버에 저장하세요
-        itemList.add("2019-10-23\n 유격 훈련");
-        itemList.add("2019-10-23\n 혹한기 훈련");
-        itemList.add("2019-10-23\n 끔직한 훈련");
+        ArrayList<Schedule> itemList = new ArrayList<>(); //itemlist를 불러와서 서버에 저장하세요
+        JSONArray jsonArray = getNearSchedule();
+
+        try {
+            if (jsonArray.length() == 0) {
+                Schedule schedule = new Schedule();
+                schedule.schedule_type = -1;
+                schedule.start_date = "null";
+                schedule.end_date = "null";
+                schedule.title = "null";
+                schedule.pk = -1;
+                itemList.add(schedule);
+            } else {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject object = jsonArray.getJSONObject(i);
+                    Schedule schedule = new Schedule();
+                    schedule.schedule_type = object.getInt("schedule_type");
+                    schedule.start_date = object.getString("start_date");
+                    schedule.end_date = object.getString("end_date");
+                    schedule.title = object.getString("title");
+                    schedule.pk = object.getInt("id");
+                    itemList.add(schedule);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getActivity().getApplicationContext(), "에러 발생", Toast.LENGTH_LONG).show();
+        }
 
         btnAdd=(Button)view.findViewById(R.id.btnAdd);
         btnDel=(Button)view.findViewById(R.id.btnDel);
