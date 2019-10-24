@@ -35,27 +35,23 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/editText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:hint="일정을 입력해주세요."
-            android:inputType="textPersonName" />
-
         <Button
             android:id="@+id/btnAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="추가" />
+            android:background="@drawable/btn_plan"
+            android:text="추가"
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/btnDel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="삭제" />
+            android:layout_weight="1"
+            android:background="@drawable/btn_plan"
+            android:text="삭제"
+            android:textColor="@color/white" />
 
     </LinearLayout>
 
