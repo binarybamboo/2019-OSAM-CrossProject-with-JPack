@@ -1,6 +1,8 @@
 package com.sonagi.android.myapplication.row;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,26 +10,36 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sonagi.android.myapplication.R;
+import com.sonagi.android.myapplication.SecondFragment;
+import com.sonagi.android.myapplication.today_tab.CheckSchedule;
+import com.sonagi.android.myapplication.today_tab.Schedule;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class MyAdapter extends BaseAdapter {
 
     /* 아이템을 세트로 담기 위한 어레이 */
-    private ArrayList<Address_Item> mItems = new ArrayList<>();
+    private ArrayList<CheckSchedule> mItems;
 
 
-
+    public void initArray() {
+        mItems = new ArrayList<>();
+    }
     @Override
     public int getCount() {
         return mItems.size();
     }
 
     @Override
-    public Address_Item getItem(int position) {
-
+    public CheckSchedule getItem(int position) {
         return mItems.get(position);
     }
 
@@ -48,25 +60,22 @@ public class MyAdapter extends BaseAdapter {
         }
 
         /* 'listview_custom'에 정의된 위젯에 대한 참조 획득 */
-        EditText s_date = (EditText) convertView.findViewById(R.id.s_date) ;
-        EditText e_date = (EditText) convertView.findViewById(R.id.e_date) ;
-        CheckBox chkbox = (CheckBox)convertView.findViewById(R.id.checkBox);
-        EditText plan = (EditText) convertView.findViewById(R.id.plan) ;
+        TextView title = (TextView) convertView.findViewById(R.id.title) ;
+        TextView content = (TextView) convertView.findViewById(R.id.date_content) ;
+        CheckBox checkBox = (CheckBox)convertView.findViewById(R.id.checkbox);;
 
         /* 각 리스트에 뿌려줄 아이템을 받아오는데 mMyItem 재활용 */
-        final Address_Item myItem = getItem(position);
+        final CheckSchedule myItem = getItem(position);
 
         /* 각 위젯에 세팅된 아이템을 뿌려준다 */
-        s_date.setText(myItem.getsDate());
-        e_date.setText(myItem.geteDate());
+        title.setText(myItem.title);
+        content.setText(myItem.start_date + "~" + myItem.end_date);
+        checkBox.setChecked(myItem.check);
 
-        plan.setText(myItem.getPlan());
-        chkbox.setChecked(myItem.isCheckBoxState());
-
-        chkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                myItem.setCheckBoxState(isChecked);
+                myItem.check = isChecked;
             }
         });
 
@@ -76,35 +85,65 @@ public class MyAdapter extends BaseAdapter {
         return convertView;
     }
 
-    public void removeItem(){
-        ArrayList<Address_Item> remove_object = new ArrayList<Address_Item>();
-
-        for(Address_Item item : mItems){
-            if(item.isCheckBoxState() == true){
+    public void removeItem(String token){
+        ArrayList<CheckSchedule> remove_object = new ArrayList<CheckSchedule>();
+        boolean check;
+        for(CheckSchedule item : mItems){
+            if (item.check) {
                 remove_object.add(item);
             }
         }
 
-        for(Address_Item item : remove_object){
+        for(CheckSchedule item : remove_object){
             mItems.remove(item);
+
+            class Delete extends AsyncTask<String, Void, Boolean> {
+                public Boolean doInBackground(String... strings) {
+                    try {
+                        URL url = new URL(strings[0]);
+                        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                        httpURLConnection.setReadTimeout(3000);
+                        httpURLConnection.setConnectTimeout(3000);
+                        httpURLConnection.setDoOutput(true);
+                        httpURLConnection.setDoInput(true);
+                        httpURLConnection.setRequestProperty("Authorization", "jwt " + strings[1]);
+                        httpURLConnection.setRequestProperty("Content-Type","application/json");
+                        httpURLConnection.setRequestProperty("Accept","application/json");
+                        httpURLConnection.setRequestMethod("DELETE");
+                        httpURLConnection.setUseCaches(false);
+
+                        int statusCode = httpURLConnection.getResponseCode();
+
+                        if (statusCode == 202) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                }
+            }
+            try {
+                Delete delete = new Delete();
+                check = delete.execute("http://13.125.196.191/schedule/" + Integer.toString(item.pk) +"/", token).get();
+            } catch (Exception e) {
+                e.printStackTrace();
+                check = false;
+            }
         }
-
-
     }
 
     /* 아이템 데이터 추가를 위한 함수. 자신이 원하는대로 작성 */
-    public void addItem( String sdate, String edate,String plan,boolean chk) {
+    public void addItem(int pk, String start_date, String end_date, String content, int type) {
+        CheckSchedule mItem = new CheckSchedule();
+        mItem.pk = pk;
+        mItem.start_date = start_date;
+        mItem.end_date = end_date;
+        mItem.title = content;
+        mItem.schedule_type = type;
 
-        Address_Item mItem = new Address_Item();
-
-        /* MyItem에 아이템을 setting한다. */
-        mItem.setCheckBoxState(chk);
-        mItem.setplan(plan);
-        mItem.setsDate(sdate);
-        mItem.seteDate(edate);
-
-        /* mItems에 MyItem을 추가한다. */
         mItems.add(mItem);
-
     }
 }

@@ -4,6 +4,7 @@ package com.sonagi.android.myapplication;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -43,6 +44,8 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 
+import static android.content.Context.MODE_PRIVATE;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -57,9 +60,11 @@ public class FirstFragment extends Fragment{
     TextView viewDatePick;  //  viewDatePick - 선택한 날짜를 보여주는 textView
     EditText edtDiary;   //  edtDiary - 선택한 날짜의 일기를 쓰거나 기존에 저장된 일기가 있다면 보여주고 수정하는 영역
     Button btnSave;   //  btnSave - 선택한 날짜의 일기 저장 및 수정(덮어쓰기) 버튼
-    String fileName;   //  fileName - 돌고 도는 선택된 날짜의 파일 이름
+    String dateName;   //  dateName - 돌고 도는 선택된 날짜의 파일 이름
     String [] permission_list={Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.READ_CALENDAR}; //파일입출력을 위한 권한 체크
     String token;
+    Boolean isPost;
+    int pk;
 
     public FirstFragment() {
         // Required empty public constructor
@@ -70,6 +75,10 @@ public class FirstFragment extends Fragment{
                              Bundle savedInstanceState) {
         checkPermission(); // 권한 확인
         // Inflate the layout for this fragment
+
+        SharedPreferences sf = getActivity().getSharedPreferences("auth_token", MODE_PRIVATE);
+        token = sf.getString("token", "null");
+
         View view= inflater.inflate(R.layout.fragment_first, container, false);
         datePicker = (MaterialCalendarView)view.findViewById(R.id.datePicker);
         viewDatePick = (TextView) view.findViewById(R.id.viewDatePick);
@@ -117,8 +126,7 @@ public class FirstFragment extends Fragment{
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // fileName을 넣고 저장 시키는 메소드를 호출
-                saveDiary(fileName);
+                saveDiary(dateName);
             }
         });
         return view;
@@ -182,7 +190,61 @@ public class FirstFragment extends Fragment{
         }
     }
 
-    public Boolean postDiary(final String title, final String written, final String content) {
+    public JSONObject getDiaryByDate(final int year, final int month, final int day) {
+        class Get extends AsyncTask<String, Void, JSONObject> {
+            @Override
+            public JSONObject doInBackground(String... strings) {
+                try {
+                    URL url = new URL(strings[0] + "diary/day/" + Integer.toString(year) + "/" + Integer.toString(month) + "/" + Integer.toString(day) + "/");
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setReadTimeout(3000);
+                    httpURLConnection.setConnectTimeout(3000);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setRequestProperty("Authorization", "jwt " + token);
+                    httpURLConnection.setRequestProperty("Content-Type","application/json");
+                    httpURLConnection.setRequestProperty("Accept","application/json");
+                    httpURLConnection.setRequestMethod("GET");
+                    httpURLConnection.setUseCaches(false);
+
+                    int statusCode = httpURLConnection.getResponseCode();
+
+                    if (statusCode == 200) {
+                        InputStream is = httpURLConnection.getInputStream();
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        byte[] byteBuffer = new byte[1024];
+                        byte[] byteData = null;
+                        int nLength = 0;
+                        while((nLength = is.read(byteBuffer, 0, byteBuffer.length)) != -1) {
+                            baos.write(byteBuffer, 0, nLength);
+                        }
+                        byteData = baos.toByteArray();
+
+                        String response = new String(byteData);
+                        System.out.println(response);
+
+                        JSONObject jsonObject = new JSONObject(response);
+                        return jsonObject;
+                    } else {
+                        return new JSONObject();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity().getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+
+                    JSONObject jsonObject = new JSONObject();
+                    return jsonObject;
+                }
+            }
+        }
+        try {
+            Get get = new Get();
+            return get.execute("http://13.125.196.191/").get();
+        } catch (Exception e) {
+            return new JSONObject();
+        }
+    }
+
+    public Boolean postDiary(final String written, final String content) {
         class Post extends AsyncTask<String, Void, Boolean> {
             public Boolean doInBackground(String... strings) {
                 try {
@@ -199,7 +261,6 @@ public class FirstFragment extends Fragment{
                     httpURLConnection.setUseCaches(false);
 
                     JSONObject obj = new JSONObject();
-                    obj.put("title", title);
                     obj.put("written", written);
                     obj.put("content", content);
 
@@ -210,15 +271,12 @@ public class FirstFragment extends Fragment{
                     int statusCode = httpURLConnection.getResponseCode();
 
                     if (statusCode == 201) {
-                        Toast.makeText(getActivity().getApplicationContext(), "성공적으로 등록되었습니다.", Toast.LENGTH_LONG).show();
                         return true;
-                    } else {
-                        Toast.makeText(getActivity().getApplicationContext(), "서버와의 통신이 원활하지 않습니다.", Toast.LENGTH_LONG).show();
+                    } else {;
                         return false;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(getActivity().getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
                     return false;
                 }
             }
@@ -232,7 +290,7 @@ public class FirstFragment extends Fragment{
         }
     }
 
-    public Boolean putDiary(final int pk, final String title, final String written, final String content) {
+    public Boolean putDiary(final int pk, final String content) {
         class Put extends AsyncTask<String, Void, Boolean> {
             public Boolean doInBackground(String... strings) {
                 try {
@@ -249,8 +307,6 @@ public class FirstFragment extends Fragment{
                     httpURLConnection.setUseCaches(false);
 
                     JSONObject obj = new JSONObject();
-                    obj.put("title", title);
-                    obj.put("written", written);
                     obj.put("content", content);
 
                     OutputStream os = httpURLConnection.getOutputStream();
@@ -259,16 +315,13 @@ public class FirstFragment extends Fragment{
 
                     int statusCode = httpURLConnection.getResponseCode();
 
-                    if (statusCode == 201) {
-                        Toast.makeText(getActivity().getApplicationContext(), "성공적으로 등록되었습니다.", Toast.LENGTH_LONG).show();
+                    if (statusCode == 202) {
                         return true;
                     } else {
-                        Toast.makeText(getActivity().getApplicationContext(), "서버와의 통신이 원활하지 않습니다. 잠시후 다시 시도해 주세요", Toast.LENGTH_LONG).show();
                         return false;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(getActivity().getApplicationContext(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
                     return false;
                 }
             }
@@ -329,44 +382,33 @@ public class FirstFragment extends Fragment{
         public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
                 // 이미 선택한 날짜에 일기가 있는지 없는지 체크해야할 시간이다
                 int yearc=date.getYear();
-                int days=date.getMonth();days++;
+                int days=date.getMonth(); days++;
                 int dayq=date.getDay();
                 checkedDay(yearc, days, dayq);
         }
     }
 
     private void checkedDay(int year, int monthOfYear, int dayOfMonth) {
+        viewDatePick.setText("일기 작성일 : " + year + " - " + monthOfYear + " - " + dayOfMonth);
+        dateName = year + "-" + monthOfYear + "-" + dayOfMonth;
 
-
-        // 받은 날짜로 날짜 보여주는
-        viewDatePick.setText("일기 작성일 : "+year + " - " + monthOfYear + " - " + dayOfMonth);
-
-        // 파일 이름을 만들어준다. 파일 이름은 "20170318.txt" 이런식으로 나옴
-        fileName = year + "" + monthOfYear + "" + dayOfMonth + ".txt";
-
-        // 읽어봐서 읽어지면 일기 가져오고
-        // 없으면 catch 그냥 살아? 아주 위험한 생각같다..
-        FileInputStream fis = null;
         try {
-            fis = getActivity().openFileInput(fileName);
-            DataInputStream dis = new DataInputStream(fis);
-            //byte[] fileData = new byte[fis.available()];
-            //fis.read(fileData);
-            //fis.close();
+            Calendar calendar = Calendar.getInstance();
+            JSONObject jsonObject = getDiaryByDate(year, monthOfYear, dayOfMonth);
 
-            //String str = new String(fileData, "UTF-8");
-            // 읽어서 토스트 메시지로 보여줌
-            String str = dis.readUTF();
-            dis.close();
+            if (jsonObject.isNull("content")) {
+                edtDiary.setText("");
+                btnSave.setText("새 일기 저장");
+                isPost = true;
+            } else {
+                String content = jsonObject.getString("content");
+                pk = jsonObject.getInt("id");
+                isPost = false;
 
-            //Toast.makeText(getActivity().getApplicationContext(), "일기 써둔 날", Toast.LENGTH_SHORT).show();
-            edtDiary.setText(str);
-            btnSave.setText("수정하기");
-        } catch (Exception e) { // UnsupportedEncodingException , FileNotFoundException , IOException
-            // 없어서 오류가 나면 일기가 없는 것 -> 일기를 쓰게 한다.
-            //Toast.makeText(getActivity().getApplicationContext(), "일기 없는 날", Toast.LENGTH_SHORT).show();
-            edtDiary.setText("");
-            btnSave.setText("새 일기 저장");
+                edtDiary.setText(content);
+                btnSave.setText("수정하기");
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -374,27 +416,23 @@ public class FirstFragment extends Fragment{
 
     // 일기 저장하는 메소드
     private void saveDiary(String readDay) {
-        String rt=readDay.substring(0,8);
-
-        FileOutputStream fos = null;
-
         try {
-            fos = getActivity().openFileOutput(readDay, Context.MODE_PRIVATE); //MODE_WORLD_WRITEABLE
-
             String content = edtDiary.getText().toString();
+            Boolean check;
+            if (isPost) {
+                check = postDiary(readDay, content);
+            } else {
+                check = putDiary(pk, content);
+            }
 
-            DataOutputStream dos = new DataOutputStream(fos);
-
-            dos.writeUTF(content);
-            dos.flush();
-            dos.close();
-
-            // getApplicationContext() = 현재 클래스.this ?
-            Toast.makeText(getActivity().getApplicationContext(), "성공", Toast.LENGTH_SHORT).show();
-
-        } catch (Exception e) { // Exception - 에러 종류 제일 상위 // FileNotFoundException , IOException
+            if (check) {
+                Toast.makeText(getActivity(), "성공적으로 등록 되었습니다!", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getActivity(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(getActivity().getApplicationContext(), "오류오류", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "오류가 발생했습니다.", Toast.LENGTH_LONG).show();
         }
     }
     public void checkPermission(){

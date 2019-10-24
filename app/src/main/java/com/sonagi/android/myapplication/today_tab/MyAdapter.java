@@ -75,4 +75,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             dateContentView = itemView.findViewById(R.id.date_content);
         }
     }
+
+    public void initArray() {
+        itemList = new ArrayList<>();
+    }
+
+    public void addItem(Schedule schedule) {
+        itemList.add(schedule);
+    }
 }
