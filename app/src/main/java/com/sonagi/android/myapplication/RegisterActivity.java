@@ -150,15 +150,19 @@ public class RegisterActivity extends Activity {
 
                             if (message.equals("info already exists")) {
                                 return 1;
-                            } else if (message.equals("key error")) {
+                            } else if (message.equals("user already exists")) {
                                 return 2;
-                            } else {
+                            } else if (message.equals("email already exists")) {
                                 return 3;
+                            } else if (message.equals("key error")) {
+                                return 4;
+                            } else {
+                                return -1;
                             }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        return 3;
+                        return -1;
                     }
                 }
 
@@ -178,6 +182,10 @@ public class RegisterActivity extends Activity {
             } else if (check == 1) {
                 Toast.makeText(getApplicationContext(), "사용자 정보가 중복 됩니다.", Toast.LENGTH_LONG).show();
             } else if (check == 2) {
+                Toast.makeText(getApplicationContext(), "아이디가 이미 존재 합니다.", Toast.LENGTH_LONG).show();
+            } else if (check == 3) {
+                Toast.makeText(getApplicationContext(), "이메일이 중복 됩니다.", Toast.LENGTH_LONG).show();
+            } else if (check == 4) {
                 Toast.makeText(getApplicationContext(), "입력하지 않은 필드가 존재합니다.", Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
