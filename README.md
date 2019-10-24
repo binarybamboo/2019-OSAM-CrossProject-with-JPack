@@ -55,7 +55,7 @@
  
  ㄴ...
   
-  #### File Director
+  ### File Director
 
    LoadingActivity에서 로그인에 대한 토큰 검사 후 없을 시 로그인 창, 있을시 MainActivty로 넘어감 
 
