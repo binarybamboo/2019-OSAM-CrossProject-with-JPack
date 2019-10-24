@@ -5,7 +5,8 @@
 
 사진창 
 
-### Candidates 조찬민, 박민재 
+### Candidates
+ #### 조찬민,박민재
 훈련병 시절부터 적어온 소나기가 핸드폰 실시 이후 존재감이 잊혀지고 있다<br>...*****~~(설마 너도 소나기 안쓰고 있니??)~~*****
 우리는 그 존재감을 다시 회복시키기 위해서 이 앱을 개발했다.
 
@@ -38,23 +39,24 @@
   
 ## File Manifest
 
-**LoadingActivity**
+**LoadingActivity** (activity_loading.xml)
 
- 	ㄴLoginActivity
+ 	ㄴLoginActivity (activity_login.xml)
  
- 	ㄴRegistrActivity
+ 	ㄴRegistrActivity (activity_info_register.xml)
  
- 	ㄴInfoModifyActivity
+ 	
  
  
- **MainActivty(BottomNavigationView)**
+ **MainActivty(BottomNavigationView)** (acitivity_main.xml)
  
- 	ㄴFirstFragement
+ 	ㄴFirstFragement (fragement_first)
+ 	  ㄴMaterialCalendarView
  
- 	ㄴSecondFragement
+ 	ㄴSecondFragement (fragment_second.xml)
  
- 	ㄴThirdFragment
- 
+ 	ㄴThirdFragment (fragment_third.xml)
+	  ㄴInfoModifyActivity (activity_info_modify.xml)
  	ㄴ...
   
   **File Director**
@@ -68,7 +70,8 @@
    
    
  ## Copyright / End User License
-   모든 사용자
+ 
+   Calendar: MaterialCalendarView()[Github](https://github.com/prolificinteractive/material-calendarview)
    
  ## Contact Information
   email: happyjarban@gmail.com or sobu0715@gmail.com
