@@ -24,7 +24,7 @@
   ㄴ ~~에뮬레이터는 안드로이드 스튜디오를 사용하지 않고 지니모션을 사용하였습니다. 
   
   
-  개인적으로 안드로이드 에뮬보다 지니모션이 빨른거 같아요.~~
+  개인적으로 안드로이드 에뮬보다 지니모션이 빨른거 같.~~
 
 
 ## Back-End
@@ -59,7 +59,7 @@
   
   **File Director**
 
-   LoadingActivity에서 로그인에 대한 토큰 검사 후 없을 시 로그인 창, 있을시 MainActivty로 넘어감 
+   LoadingActivity에서 로그인에 대한 토큰 검사 후 없을 시 로그인 창, 있을시 MainActivty로 넘어가는 Acting
 
 
 ## Installation Process
@@ -79,7 +79,7 @@
  
  
 ## Troubleshooting
- 위의 연락처에 메일을 주십쇼! 
+ 위의 연락처에 메일을 주시면 답변해 드리겠습니다.
 
 ## Credit
   ~~### plz Email happyjarban@gmail.com~~
