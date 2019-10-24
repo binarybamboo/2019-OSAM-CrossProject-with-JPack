@@ -33,8 +33,9 @@
                 android:layout_height="wrap_content"
                 android:text="소나기"
                 android:textColor="@color/colorPrimaryDark"
-                android:textFontWeight="bold"
-                android:textSize="48dp" />
+
+                android:textSize="48dp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
